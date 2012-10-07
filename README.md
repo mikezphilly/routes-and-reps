@@ -15,46 +15,42 @@ http://www.azavea.com/a/hacks-for-democracy/
 
 TODO
 
--add Rail and atypical bus names to the app
--fix styles in the app
--include info/stats about the route
--a single contact form to contact all the elected officials on a route
--a way to integrate public notices and hearings:
-	http://septa.org/notice/
-	http://septa.org/notice/asp/hearings.html
--generate route/district lookup up on the fly (cartoDB)
--search dy district (and view all routes that go through the district
+*add Rail and atypical bus names to the app
+*fix styles in the app
+*include info/stats about the route
+*a single contact form to contact all the elected officials on a route
+*a way to integrate public notices and hearings:
+	*http://septa.org/notice/
+	*http://septa.org/notice/asp/hearings.html
+*generate route/district lookup up on the fly (cartoDB)
+*search dy district (and view all routes that go through the district
 
 //-----------------------------------------------
 
 CONTENT (besides this file):
 
-/image_samples - images demonstrating the concept
+*/data_source - the routines used to create a lookup table for the app
+*/data_source/septa.py - script used in ArcGIS to generate the CSV's zipped below
+*/data_source/csv.zip - correlation of districts for surface route, one for each route
+*/data_source/RailCSV.zip - correlation of districts for regional rail routes (not yet used)
+*/data_source/parse_csv.php - parses above csv's and creates sql 'insert' statement (piped to the file below)
+*/data_source/route_dist_lookuptable_insert.sql - output ov the parse_csv.php script
+*/data_source/routes_and_reps.sql - mysqldump of lookup table used in the app
 
-/data_source - the routines used to create a lookup table for the app
-/data_source/septa.py - script used in ArcGIS to generate the CSV's zipped below
-/data_source/csv.zip - correlation of districts for surface route, one for each route
-/data_source/RailCSV.zip - correlation of districts for regional rail routes (not yet used)
-/data_source/parse_csv.php - parses above csv's and creates sql 'insert' statement (piped to the file below)
-/data_source/route_dist_lookuptable_insert.sql - output ov the parse_csv.php script
-/data_source/routes_and_reps.sql - mysqldump of lookup table used in the app
-
-/app - routines for the web app
-/app/index.html - list of all the route options
-/app/about.html - a simple about page
-/app/get_rep.php - script that looks up 'Reps' the for selected routes, ugly, i know
-/app/route_dis_map.php - script that loads the map
-/app/authentication.php - stores data and cicero api credentials
-/app/get_valid_input.php - routines validate user input
-/app/htaccess - .htaccess file used for clean urls
+*/app - routines for the web app
+*/app/index.html - list of all the route options
+*/app/about.html - a simple about page
+*/app/get_rep.php - script that looks up 'Reps' the for selected routes, ugly, i know
+*/app/route_dis_map.php - script that loads the map
+*/app/authentication.php - stores data and cicero api credentials
+*/app/get_valid_input.php - routines validate user input
+*/app/htaccess - .htaccess file used for clean urls
 
 
 
 //-----------------------------------------------
 
-RESOURCES:
-
-API's:
+DATA SOURCES AND API's:
 
 Congressional District Reps
 http://services.sunlightlabs.com/api/
