@@ -8,8 +8,8 @@
     <meta name="author" content="">
 
     <!-- Le styles -->
-    <link href="./assets/css/bootstrap.css" rel="stylesheet">
-    <link href="./assets/css/bootstrap-responsive.css" rel="stylesheet">
+    <link href="./inc/bootstrap.css" rel="stylesheet">
+    <link href="./inc/bootstrap-responsive.css" rel="stylesheet">
 
     <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
     <!--[if lt IE 9]>
@@ -17,7 +17,7 @@
     <![endif]-->
 
     <!-- Le fav and touch icons -->
-    <link rel="shortcut icon" href="favicon.ico">
+    <link rel="shortcut icon" href="./favicon.ico">
     <link rel="apple-touch-icon-precomposed" sizes="144x144" href="./assets/ico/apple-touch-icon-144-precomposed.png">
     <link rel="apple-touch-icon-precomposed" sizes="114x114" href="./assets/ico/apple-touch-icon-114-precomposed.png">
     <link rel="apple-touch-icon-precomposed" sizes="72x72" href="./assets/ico/apple-touch-icon-72-precomposed.png">
@@ -34,11 +34,11 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </a>
-          <a class="brand" href="./index.html">Routes and Reps</a>
+          <a class="brand" href="./">Routes and Reps</a>
           <div class="nav-collapse collapse">
             <ul class="nav">
-              <li class="active"><a href="./index.html">Home</a></li>
-              <li><a href="./about.html">About</a></li>
+<!--              <li class="active"><a href="./index.html">Home</a></li>  -->
+              <li><a href="./about">About</a></li>
  <!--             <li><a href="#contact">Contact</a></li>
 
               <li class="dropdown">
@@ -255,12 +255,11 @@
 <option value="R2S:Wilmington/Newark">Wilmington/Newark</option>
 <optgroup>
 </select>
+
 </form>
 
 </div>
 </div>
-
-</p>
 </div>
 
 <?php 
@@ -280,6 +279,8 @@ if (isset($_GET['route'])){
 
 //=======================
 if ($route){
+
+  $showfooter=1;
 
 // Obtain a cicero token:
 $response = get_response('http://cicero.azavea.com/v3.1/token/new.json', "username=$username&password=$password");
@@ -310,6 +311,8 @@ $dis_senate = explode(',',$dis_senate);
 $dis_house = explode(',',$dis_house);
 $dis_city = explode(',',$dis_city);
 
+  // count the number of popovers
+  $popcount=1;
 ?>
 
 		<!-- Route Name Header -->
@@ -319,7 +322,7 @@ $dis_city = explode(',',$dis_city);
         </div>
 		</div>
 
-		<!----------------------- CONGRESSIONAL DISTRICTS ----------------------->
+		<!-- --------------------- CONGRESSIONAL DISTRICTS --------------------- -->
       <!-- DISTRICT MAP AND REP DATA TABLE -->
       <div class="row">
         <div class="span6">
@@ -336,7 +339,8 @@ $dis_city = explode(',',$dis_city);
 			<?php
 				sort($dis_cong); 
 				foreach ($dis_cong as $dis){
-					get_cong_rep($dis);
+				  get_cong_rep($dis,$popcount);
+					$popcount++;
 				}
 			?>
 				</tbody>
@@ -347,7 +351,7 @@ $dis_city = explode(',',$dis_city);
 
       <hr>
 
-      <!----------------------- PA SENATE ----------------------->	
+      <!-- --------------------- PA SENATE --------------------- -->	
       <!-- DISTRICT MAP AND REP DATA TABLE -->
       <div class="row">
         <div class="span6">
@@ -364,7 +368,8 @@ $dis_city = explode(',',$dis_city);
 			<?php
 				sort($dis_senate); 
 				foreach ($dis_senate as $dis){
-					get_cicero($dis, $token, $user, 'STATE_UPPER', 'pasenatorial2011_01');
+				  get_cicero($dis, $token, $user, 'STATE_UPPER', 'pasenatorial2011_01',$popcount);
+				  $popcount++;
 				}
 			?>
 				</tbody>
@@ -373,7 +378,7 @@ $dis_city = explode(',',$dis_city);
       </div>
       <hr>
 
-      <!----------------------- PA HOUSE  ----------------------->	
+      <!-- --------------------- PA HOUSE  --------------------- -->	
       <!-- DISTRICT MAP AND REP DATA TABLE -->
       <div class="row">
         <div class="span6">
@@ -390,7 +395,8 @@ $dis_city = explode(',',$dis_city);
 			<?php
 				sort($dis_house); 
 				foreach ($dis_house as $dis){
-					get_cicero($dis, $token, $user, 'STATE_LOWER', 'pahouse2011_01');
+				  get_cicero($dis, $token, $user, 'STATE_LOWER', 'pahouse2011_01', $popcount);
+				  $popcount++;
 				}
 			?>
 				</tbody>
@@ -399,7 +405,7 @@ $dis_city = explode(',',$dis_city);
       </div>
       <hr>
 
-      <!-----------------------  CITY COUNCIL  ----------------------->	
+      <!-- ---------------------  CITY COUNCIL  --------------------- -->	
       <!-- DISTRICT MAP AND REP DATA TABLE -->
       <div class="row">
         <div class="span6">
@@ -416,12 +422,9 @@ $dis_city = explode(',',$dis_city);
 			<?php
 				sort($dis_city); 
 				foreach ($dis_city as $dis){
-					get_cicero($dis, $token, $user, 'LOCAL', 'philadelphiacouncild');
+				  get_cicero($dis, $token, $user, 'LOCAL', 'philadelphiacouncild',$popcount);
+				  $popcount++;
 				}
-				    } // if ($route)
-				    else {
-				      //do nothing
-				    }
 			?>
 				</tbody>
 				</table>
@@ -429,9 +432,12 @@ $dis_city = explode(',',$dis_city);
       </div>
       <hr>
 
-
-
 <?php
+
+				    } // if ($route)
+				    else {
+				      //do nothing
+				    }
 
 //---------------------------- functions ------------------------------------
 
@@ -482,7 +488,7 @@ function get_response($url, $postfields=''){
 
 
 // cicero api to get all reps EXCEPT Congressional District Reps
-function get_cicero($dis, $token, $user, $type, $dbtable){
+				    function get_cicero($dis, $token, $user, $type, $dbtable,$popcount){
 
 	// fields names are different for city council district numbers
 	if ($dbtable=="philadelphiacouncild"){
@@ -535,11 +541,28 @@ function get_cicero($dis, $token, $user, $type, $dbtable){
 			break;
 		}
 	
+	echo "<!-- ";  print_r($o);  echo "-->";
+
 		echo "</td><td>".$o->first_name ." ".$o->last_name."</td>
-	<td> <a href=\"#\" class=\"btn btn-info btn-small\" rel=\"clickover\"
-	title=\"Dist: ".$dis." | ".$o->first_name ." ".$o->last_name."\"
-	data-content=\"Rep Data\">More &raquo;</a></td>
+	        <td> 
+                <a href=\"#\" 
+                class=\"btn btn-info btn-small\"  
+                id=\"repdet".$popcount."\"
+	        title=\"District ".$dis.":  ".$o->first_name ." ".$o->last_name."\"
+	    
+	data-content=\"";
+	echo htmlspecialchars("<strong>Office:  </strong>".
+	$o->addresses[0]->address_1 .", ".$o->addresses[0]->address_2.",".$o->addresses[0]->city.", ".$o->addresses[0]->state.", ".$o->addresses[0]->postal_code ."<br />
+	<strong>Phone:  </strong>  ". $o->addresses[0]->phone_1 ."<br />
+	<strong>FAX:  </strong>  ". $o->addresses[0]->fax_1."<br />
+	<strong>Website:  </strong><a href=\"".$o->urls[1]."\">".$o->urls[1]."</a><br />
+	<strong>Contact:  </strong><a href=\"". $o->urls[0]."\">". $o->urls[0]."</a><br />");
+			      
+
+echo "\">
+	More &raquo;</a></td>
 	</tr>";
+
 
  	endforeach;
 }
@@ -550,7 +573,8 @@ function get_cicero($dis, $token, $user, $type, $dbtable){
 
 // SUNLIGHTLABS Legislator API
 // prints the Congressional District Reps
-function get_cong_rep($dis){
+function get_cong_rep($dis, $popcount){
+  
 	$curl_handle=curl_init();
 	curl_setopt($curl_handle,CURLOPT_URL,"http://services.sunlightlabs.com/api/legislators.get?apikey=011ae27269214b9b8f74f7c9c9d04380&state=PA&district=".$dis);
 	curl_setopt($curl_handle,CURLOPT_CONNECTTIMEOUT,2);
@@ -568,33 +592,36 @@ function get_cong_rep($dis){
 	$json_a["response"]["legislator"]["name_suffix"]."</td>
 	<td> 
 
-	<a href=\"#\" class=\"btn btn-info btn-small\"  id=\"repdet\" 
+	<a href=\"#\" class=\"btn btn-info btn-small\" id=\"repdet".$popcount."\"
 
-	title=\"Dist: ".$dis." | "
+	title=\"District ".$dis.":  "
 	.$json_a["response"]["legislator"]["firstname"] ." ".
 	$json_a["response"]["legislator"]["middlename"]." ".
 	$json_a["response"]["legislator"]["lastname"] ." ".
 	$json_a["response"]["legislator"]["name_suffix"]."\"
 
-	data-content=\"<strong>Office:</strong>".
+	data-content=\"";
+	echo htmlspecialchars("<strong>Office:  </strong>".
 	$json_a["response"]["legislator"]["congress_office"]."<br />
-	<strong>Phone:</strong>  ".$json_a["response"]["legislator"]["phone"]."<br />
-	<strong>FAX:</strong>  ".$json_a["response"]["legislator"]["fax"]."<br />
+	<strong>Phone:  </strong>  ".$json_a["response"]["legislator"]["phone"]."<br />
+	<strong>FAX:  </strong>  ".$json_a["response"]["legislator"]["fax"]."<br />
 
-	<strong>Website:</strong>  ".$json_a["response"]["legislator"]["website"]."<br />
-	<strong>Contact Form:</strong>  ".$json_a["response"]["legislator"]["webform"]."<br />
-	<strong>Youtube:</strong>  ".$json_a["response"]["legislator"]["youtube_url"]."<br />
-	<strong>Congresspedia:</strong>  ".$json_a["response"]["legislator"]["congresspedia_url"]."<br />
-	<strong>Twitter:</strong>  http://www.twitter.com/".$json_a["response"]["legislator"]["website"]."<br />"
+	<strong>Website:  </strong><a href=\"".$json_a["response"]["legislator"]["website"]."\">".$json_a["response"]["legislator"]["website"]."</a><br />
+	<strong>Contact:  </strong><a href=\"".$json_a["response"]["legislator"]["webform"]."\">".$json_a["response"]["legislator"]["webform"]."</a><br />
+	<strong>Youtube:  </strong><a href=\"".$json_a["response"]["legislator"]["youtube_url"]."\">".$json_a["response"]["legislator"]["youtube_url"]."</a><br />
+	<strong>Congresspedia:  </strong><a href=\"".$json_a["response"]["legislator"]["congresspedia_url"]."\">".$json_a["response"]["legislator"]["congresspedia_url"]."</a><br />
+	<strong>Twitter:  </strong><a href=\"http://www.twitter.com/".$json_a["response"]["legislator"]["website"]."\">http://www.twitter.com/".$json_a["response"]["legislator"]["website"]."</a><br />");
+			      
 
-
-	."\">
+echo "\">
 	More &raquo;</a></td>
 	</tr>";
 }
 
 ?>
 
+
+<?php  if ($showfooter){ ?>
 <div class="hero-unit" align="center">
         <div class="span12">
 
@@ -779,18 +806,21 @@ function get_cong_rep($dis){
 
 </div>
 </div>
+</div>
+	
 
+   <?php } ?>
 
       <footer>
- <!--       <p><a href="http://www.septa.org/">&copy; SEPTA</a></p>  -->
+      <p>
+      This app is in development.  <a href="http://groups.google.com/group/septadev/">SEPTAdev</a>
+      </p>
+
       </footer>
 
     </div> <!-- /container -->
 
-    <!-- Le javascript
-    ================================================== -->
-    <!-- Placed at the end of the document so the pages load faster -->
-
+<!-- JS placed at the end of the document so the pages load faster -->
 
 <script type="text/javascript">
   function loadmap(route) {
@@ -798,44 +828,20 @@ function get_cong_rep($dis){
   }
 </script>
 
-    <script src="./assets/js/jquery.js"></script>
- <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
-    <script src="./assets/js/bootstrap-transition.js"></script>
-<script type="text/javascript" src="./assets/js/bootstrap.js"></script>
-<!--
-    <script src="./assets/js/bootstrap-alert.js"></script>
-    <script src="./assets/js/bootstrap-modal.js"></script>
-    <script src="./assets/js/bootstrap-dropdown.js"></script>
-    <script src="./assets/js/bootstrap-scrollspy.js"></script>
-    <script src="./assets/js/bootstrap-tab.js"></script>
-    <script src="./assets/js/bootstrap-tooltip.js"></script>
-    <script src="./assets/js/bootstrap-popover.js"></script>
-    <script src="./assets/js/bootstrap-button.js"></script>
-    <script src="./assets/js/bootstrap-collapse.js"></script>
-    <script src="./assets/js/bootstrap-carousel.js"></script>
-    <script src="./assets/js/bootstrap-typeahead.js"></script>
--->
-	<script type="text/javascript" src="./assets/js/bootstrapx-clickover.js"></script>
+<script src="./inc/jquery.min.js"></script>
+<script type="text/javascript" src="./inc/bootstrap.js"></script>
+<script type="text/javascript" src="./inc/bootstrapx-clickover.js"></script>
 
-    <script type="text/javascript">
-				    $(function() { 
-					$('[rel="clickover"]').clickover({placement: 'left', width: 350, height: 300 }); 
-					$('#repdet').clickover({placement: 'left', width: 350, height: 300 });
-				      })
-    </script>
-
-
-<!--
-    <script type="text/javascript">
-      $(function() { 
-          $('[rel="clickover"]').clickover({
-	    placement: 'left',
-		width: 400,
-		height: 300
-	}); 
-      })
-    </script>
--->
+<script type="text/javascript">
+  $(function() { 
+    $('[rel="clickover"]').clickover(); 
+	<?php
+	for ($i=1;$i<=$popcount;$i++){
+	   echo "$('#repdet".$i."').clickover({placement: 'left', width: 600 });\n";
+	}
+	?>
+  })
+</script>
 
   </body>
 </html>
