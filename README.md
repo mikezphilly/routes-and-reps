@@ -1,4 +1,5 @@
 Routes and Reps - SEPTA
+
 http://www3.septa.org/reps/
 
 Find Elected Officials for any SEPTA route.
@@ -31,11 +32,12 @@ CONTENT (besides this file):
 /image_samples - images demonstrating the concept
 
 /data_source - the routines used to create a lookup table for the app
+/data_source/septa.py - script used in ArcGIS to generate the CSV's zipped below
 /data_source/csv.zip - correlation of districts for surface route, one for each route
 /data_source/RailCSV.zip - correlation of districts for regional rail routes (not yet used)
-/data_source/parse_csv.php - parses above csv's and creates sql 'insert' statement
-/data_source/route_dist_lookuptable_insert.sql - sample output from above php script
-/data_source/septa.py - script used in ArcGIS to generate the route/distrcit lookup table
+/data_source/parse_csv.php - parses above csv's and creates sql 'insert' statement (piped to the file below)
+/data_source/route_dist_lookuptable_insert.sql - output ov the parse_csv.php script
+/data_source/routes_and_reps.sql - mysqldump of lookup table used in the app
 
 /app - routines for the web app
 /app/index.html - list of all the route options
@@ -46,7 +48,7 @@ CONTENT (besides this file):
 /app/get_valid_input.php - routines validate user input
 /app/htaccess - .htaccess file used for clean urls
 
-/db/routes_and_reps.sql - mysqldump of lookup table used in the app
+
 
 //-----------------------------------------------
 
